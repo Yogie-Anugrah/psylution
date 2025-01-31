@@ -39,4 +39,5 @@ RUN chmod -R 775 storage bootstrap/cache
 EXPOSE 9000
 
 # Jalankan PHP-FPM
-CMD ["php-fpm"]
+# CMD ["php-fpm"]
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
