@@ -40,6 +40,9 @@
                 <li class="nav-item">
                     <a class="nav-link text-dark fw-bold" href="/testimoni">Testimoni</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-bold" href="/about-us">Tentang Kami</a>
+                </li>
             </ul>
         </div>
 
