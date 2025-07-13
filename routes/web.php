@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,10 +36,15 @@ Route::post('/testimoni/store', [TestimoniController::class, 'store'])->name('te
 Route::get('/about-us', [AboutController::class, 'index'])->name('about-us');
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
+Route::get('login/google', [RegisterController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('login/google/callback', [RegisterController::class, 'handleGoogleCallback']);
 Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
-Auth::routes();
+Route::get('register/google', [RegisterController::class,'redirectToGoogle'])->name('register.google');
+Route::get('register/google/callback', [RegisterController::class,'handleGoogleCallback']);
+// Auth::routes();
+Auth::routes(['verify' => true]);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/dashboard', function () {
     if (!session()->has('user')) {
@@ -46,11 +52,12 @@ Route::get('/dashboard', function () {
     }
     return view('dashboard');
 })->name('dashboard');
-Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-
-Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+Route::get('password/reset',      [ForgotPasswordController::class,'showLinkRequestForm'])
+        ->name('password.request');
+Route::post('password/email',     [ForgotPasswordController::class,'sendResetLinkEmail'])
+        ->name('password.email');
+Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
+Route::post('password/reset',      'Auth\ResetPasswordController@reset')->name('password.update');
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
 Route::get('/booking/{id}/form', [BookingController::class, 'form']);
