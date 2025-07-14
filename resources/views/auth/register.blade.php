@@ -131,17 +131,17 @@
 
                         {{-- Full Name --}}
                         <div class="mb-3">
-                            <label for="full_name" class="form-label" style="color: #251D4C;">Full Name</label>
+                            <label for="name" class="form-label" style="color: #251D4C;">Full Name</label>
                             <input
                                 type="text"
-                                name="full_name"
-                                id="full_name"
-                                class="form-control @error('full_name') is-invalid @enderror"
-                                value="{{ old('full_name', $full_name ?? '') }}"
+                                name="name"
+                                id="name"
+                                class="form-control @error('name') is-invalid @enderror"
+                                value="{{ old('name', $name ?? '') }}"
                                 required
                                 autofocus
                             >
-                            @error('full_name')
+                            @error('name')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
@@ -280,17 +280,17 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="full_name_mobile" class="form-label" style="color: #251D4C;">Full Name</label>
+                        <label for="name_mobile" class="form-label" style="color: #251D4C;">Full Name</label>
                         <input
                             type="text"
-                            name="full_name"
-                            id="full_name_mobile"
-                            class="form-control @error('full_name') is-invalid @enderror"
-                            value="{{ old('full_name', $full_name ?? '') }}"
+                            name="name"
+                            id="name_mobile"
+                            class="form-control @error('name') is-invalid @enderror"
+                            value="{{ old('name', $name ?? '') }}"
                             required
                             autofocus
                         >
-                        @error('full_name')
+                        @error('name')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
                     </div>

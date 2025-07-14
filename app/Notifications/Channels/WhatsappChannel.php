@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 class WhatsappChannel
 {
     /**
-     * Send the given notification.
+     * Send the given notification via Starsender.
      */
     public function send($notifiable, Notification $notification): void
     {
@@ -17,16 +17,20 @@ class WhatsappChannel
             return;
         }
 
-        // Notification harus menyediakan toWhatsapp()
+        // Ambil pesan WhatsApp dari Notification
         $message = $notification->toWhatsapp($notifiable);
 
+        // Kirim POST, letakkan API key di body alih‐alih di header
         Http::withHeaders([
-            'Authorization' => 'Bearer ' . config('starsender.api_key'),
-            'Accept'        => 'application/json',
-            'Content-Type'  => 'application/json',
+            'Accept'       => 'application/json',
+            'Content-Type' => 'application/json',
         ])->post(config('starsender.base_url'), [
-            'phone'   => $to,
-            'message' => $message,
+            'messageType'   => 'text',
+            'to'         => $to,
+            'body'       => $message,
+            // Sertakan key di payload sesuai requirement Starsender
+            'Authorization'       => config('starsender.api_key'),
+            'delay'      => 15, // Delay 15 detik
         ]);
     }
 }

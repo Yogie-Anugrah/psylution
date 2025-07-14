@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use App\Models\User;
 use App\Jobs\SendWhatsappJob;
-use App\Notifications\ResetPasswordNotification;
 
 class ForgotPasswordController extends Controller
 {
@@ -16,17 +15,13 @@ class ForgotPasswordController extends Controller
         $this->middleware('guest');
     }
 
-    /**
-     * Show form to request reset link.
-     */
+    /** Tampilkan form “Forgot Password” */
     public function showLinkRequestForm()
     {
         return view('auth.passwords.email');
     }
 
-    /**
-     * Handle sending reset link via WhatsApp (Starsender) or fallback to email.
-     */
+    /** Kirim link reset hanya via WhatsApp */
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate([
@@ -44,21 +39,18 @@ class ForgotPasswordController extends Controller
                 ->withInput();
         }
 
-        // Generate token
+        // Generate token & link
         $token = Password::getRepository()->create($user);
         $link  = url(route('password.reset', [
             'token' => $token,
             'email' => $user->email,
         ], false));
 
-        // Dispatch WhatsApp job (Starsender)
+        // Kirim via WhatsApp saja
         dispatch(new SendWhatsappJob(
             $user->whatsapp,
-            "Link reset password kamu: {$link}"
+            "Halo {$user->name},\n\nUntuk mereset password kamu silakan klik link berikut:\n{$link}"
         ));
-
-        // Fallback—jika WA gagal, kirim juga email
-        $user->notify(new ResetPasswordNotification($link));
 
         return back()
             ->with('status', 'Link reset telah dikirim via WhatsApp. Silakan cek WhatsApp Anda.');
