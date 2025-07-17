@@ -68,12 +68,17 @@ Route::post('/booking/submit', [BookingController::class, 'submit']);
 Route::get('/booking/invoice', [BookingController::class, 'invoice'])->middleware('auth');;
 
 // routes/web.php
-Route::get('/payment/success', function () {
-    return view('payment.success');
-});
-Route::get('/payment/failed', function () {
-    return view('payment.failed');
-});
+// Route::get('/payment/success', function () {
+//     return view('payment.success');
+// })->name('payment.success');
+// Route::get('/payment/failed', function () {
+//     return view('payment.failed');
+// })->name('payment.failed');
+
+Route::get('/payment/success', [PaymentController::class, 'handleSuccess'])
+     ->name('payment.success');
+Route::get('/payment/failed',  [PaymentController::class, 'handleFailed'])
+     ->name('payment.failed');
 
 Route::post('/payment/create', [\App\Http\Controllers\PaymentController::class, 'createInvoice'])->name('payment.create');
 
