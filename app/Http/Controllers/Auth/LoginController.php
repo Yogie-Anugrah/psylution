@@ -54,20 +54,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
     public function __construct()
     {
-        // Hanya tamu (guest) yg boleh akses kecuali logout
+        // Hanya tamu (guest) yang boleh akses kecuali logout
         $this->middleware('guest')->except('logout');
     }
 
+    /**
+     * Tampilkan form login.
+     */
     public function showLoginForm()
     {
-        return view('auth.login'); // pastikan form memakai <input name="login">
+        return view('auth.login');
     }
 
+    /**
+     * Proses login (email atau whatsapp).
+     */
     public function login(Request $request)
     {
         // 1) Validasi input
@@ -76,35 +83,37 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        // 2) Tentukan apakah user memasukkan email atau whatsapp
+        // 2) Deteksi apakah user isi email atau whatsapp
         $loginInput = $request->input('login');
-        $field      = filter_var($loginInput, FILTER_VALIDATE_EMAIL)
-                          ? 'email'
-                          : 'whatsapp';
+        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'whatsapp';
 
-        // 3) Siapkan credential dan coba Auth
+        // 3) Coba authenticate via Auth facade
         $credentials = [
             $field     => $loginInput,
             'password' => $request->password,
         ];
 
-        if (Auth::attempt($credentials)) {
-            // regenerasi session untuk keamanan
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            // Regenerasi session untuk mencegah fixation
             $request->session()->regenerate();
 
-            // (opsional) simpan info user di session
+            // (Opsional) simpan data user di session
             Session::put('user', Auth::user());
 
+            // Redirect ke dashboard atau intended page
             return redirect()->intended(route('dashboard'))
                    ->with('success', 'Login berhasil!');
         }
 
-        // 4) Jika gagal, kembalikan error di field "login"
+        // 4) Gagal login
         return back()
-            ->withErrors(['login' => 'Invalid credentials'])
+            ->withErrors(['login' => 'Email/WhatsApp atau password salah'])
             ->withInput($request->only('login'));
     }
 
+    /**
+     * Logout user.
+     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -113,5 +122,38 @@ class LoginController extends Controller
 
         return redirect()->route('login');
     }
-}
 
+    /**
+     * Redirect ke Google untuk OAuth.
+     */
+    public function redirectToGoogle()
+    {
+        $callback = route('login.google.callback');
+
+        return Socialite::driver('google')
+                        ->stateless()
+                        ->redirectUrl($callback)
+                        ->redirect();
+    }
+
+    /**
+     * Handle callback dari Google OAuth.
+     */
+    public function handleGoogleCallback()
+    {
+        $socialUser = Socialite::driver('google')->stateless()->user();
+
+        // Jika user dengan email ini sudah ada di DB, langsung login
+        if ($user = \App\Models\User::where('email', $socialUser->getEmail())->first()) {
+            Auth::login($user);
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // Jika belum ada, redirect ke register dengan prefill
+        return redirect()->route('register')
+                         ->withInput([
+                             'name'  => $socialUser->getName(),
+                             'email' => $socialUser->getEmail(),
+                         ]);
+    }
+}

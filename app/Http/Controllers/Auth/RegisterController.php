@@ -99,30 +99,37 @@ class RegisterController extends Controller
     }
 
     /**
-     * Redirect to Google OAuth page.
+     * Redirect the user to Google for OAuth (register).
      */
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        // Akan menghasilkan callback yang tepat sesuai host dan route
+        $callback = route('login.google.callback');
+
+
+        return Socialite::driver('google')
+                        ->stateless()
+                        ->redirectUrl($callback)
+                        ->redirect();
     }
 
     /**
-     * Handle callback from Google.
+     * Handle Google callback for registration.
      */
     public function handleGoogleCallback()
     {
         $socialUser = Socialite::driver('google')->stateless()->user();
 
-        // If user exists, log them in
-        if ($user = User::where('email', $socialUser->getEmail())->first()) {
+        // Kalau email sudah ada, langsung login
+        if ($user = \App\Models\User::where('email', $socialUser->getEmail())->first()) {
             Auth::login($user);
             return redirect($this->redirectPath());
         }
 
-        // Otherwise, pre-fill and show the same register form
+        // Jika belum, tampilkan register form dengan prefilled input
         return view('auth.register', [
-            'name'      => $socialUser->getName(),
-            'email'     => $socialUser->getEmail(),
+            'name'  => $socialUser->getName(),
+            'email' => $socialUser->getEmail(),
         ]);
     }
 }

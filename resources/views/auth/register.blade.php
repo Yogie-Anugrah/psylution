@@ -118,12 +118,12 @@
                     <h3 class="fw-bold text-center" style="color: #251D4C;">Sign Up</h3>
 
                     {{-- Google --}}
-                    <div class="d-grid mb-3">
+                    {{-- <div class="d-grid mb-3">
                         <a href="{{ route('register.google') }}"
                            class="btn btn-outline-dark">
                             <i class="bi bi-google"></i> Sign up with Google
                         </a>
-                    </div>
+                    </div> --}}
                     <p class="text-center" style="color:#999;">— or register manually —</p>
 
                     <form method="POST" action="{{ route('register') }}">

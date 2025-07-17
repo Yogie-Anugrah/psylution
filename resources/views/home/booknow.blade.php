@@ -12,7 +12,8 @@
                         varius. Eget amet iaculis ultricies nibh est diam.
                     </p>
                     <button class="btn btn-primary px-5 py-3" style="background-color: #4c5fd5; border: none; border-radius: 10px;">
-                        Book Now
+                        {{-- Book Now --}}
+                        <a href="/booking" class="text-white text-decoration-none">Book Now</a>
                     </button>
                 </div>
 

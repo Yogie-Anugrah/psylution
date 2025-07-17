@@ -34,4 +34,10 @@ return [
     'xendit' => [
         'secret' => env('XENDIT_SECRET_KEY'),
     ],
+    'google' => [
+        'client_id'     => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        // redirect ini hanya fallback, karena kita akan override di controller
+        'redirect'      => env('GOOGLE_REDIRECT'),
+    ],
 ];
